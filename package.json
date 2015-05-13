@@ -1,0 +1,24 @@
+{
+    "name"        : "hashtag",
+    "author"      : "James Nylen <jnylen@gmail.com>",
+    "description" : "Parse hashtags and more",
+    "version"     : "0.0.1",
+    "repository"  : {
+        "type" : "git",
+        "url"  : "https://github.com/nylen/hashtag"
+    },
+    "bugs" : {
+        "url" : "https://github.com/nylen/hashtag/issues"
+    },
+    "license"  : "MIT",
+    "keywords" : [
+        "hashtag",
+        "parse",
+        "tags"
+    ],
+    "main"    : "index.js",
+    "scripts" : {
+        "test" : "node test.js"
+    },
+    "dependencies" : {}
+}
