@@ -1,24 +1,58 @@
 var assert  = require( 'assert' ),
     hashtag = require( './index' );
 
-var obj = hashtag.parse( 'Interleaved #text and #hashtag parser' );
+function testParseTags(testString, expectedTags, expectedTokens) {
+	var obj = hashtag.parse( testString );
+	assert.deepEqual( obj.tags, expectedTags );
 
-assert.deepEqual( obj.tags, [ 'text', 'hashtag' ] );
+	assert.equal( obj.toJSON(), JSON.stringify( expectedTokens ) );
+	assert.equal( obj.toJSON( null, 4 ), JSON.stringify( expectedTokens, null, 4 ) );
+}
 
-var expectedTokens = [
-    { type : 'text', text : 'Interleaved ' },
-    { type : 'tag' , tag  : 'text' },
-    { type : 'text', text : ' and ' },
-    { type : 'tag' , tag  : 'hashtag' },
-    { type : 'text', text : ' parser' }
-];
+function testReplaceTag(testString, tagIndex, outputString) {
+	var obj = hashtag.parse( testString );
+	obj.tokens[ tagIndex ].tag = 'string';
 
-assert.equal( obj.toJSON(), JSON.stringify( expectedTokens ) );
-assert.equal( obj.toJSON( null, 4 ), JSON.stringify( expectedTokens, null, 4 ) );
+	assert.equal( obj.toString(), outputString );
+}
 
-// TODO better setTags
-obj.tokens[ 1 ].tag = 'string';
 
-assert.equal( obj.toString(), 'Interleaved #string and #hashtag parser' );
+testParseTags( 
+	'Interleaved #text and #hashtag parser', 
+	[ 'text', 'hashtag' ],
+	[
+		{ type : 'text', text : 'Interleaved ' },
+		{ type : 'tag' , tag  : 'text' },
+		{ type : 'text', text : ' and ' },
+		{ type : 'tag' , tag  : 'hashtag' },
+		{ type : 'text', text : ' parser' }
+	]
+);
+
+testParseTags( 
+	'#tags may be near #punctuation; or the end of a #sentence.', 
+	[ 'tags', 'punctuation', 'sentence' ],
+	[
+		{ type : 'tag', tag : 'tags' },
+		{ type : 'text' , text  : ' may be near ' },
+		{ type : 'tag' , tag  : 'punctuation' },
+		{ type : 'text' , text  : '; or the end of a ' },
+		{ type : 'tag' , tag  : 'sentence' },
+		{ type : 'text' , text  : '.' }
+	]
+);
+
+testParseTags( 
+	"it's #steve's hashtag and he owns it", 
+	[ 'steve' ],
+	[
+		{ type : 'text' , text  : "it's " },
+		{ type : 'tag', tag : "steve" },
+		{ type : 'text' , text  : "'s hashtag and he owns it" },
+	]
+);
+
+
+testReplaceTag( 'Interleaved #text and #hashtag parser', 1, 'Interleaved #string and #hashtag parser' );
 
 console.log('OK');
