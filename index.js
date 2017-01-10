@@ -3,9 +3,13 @@ function HashtagParser(str, tagChar, whitelist) {
         return new HashtagParser(str, tagChar);
     }
 
+    // should really use \w for this .. unicode!
+    var wordChars  = 'a-zA-Z0-9_';
+
     this.str       = str;
     this.tagChar   = (tagChar || '#');
-    this.whitelist = (whitelist || '[a-zA-Z0-9_-]');
+    this.whitelist = (whitelist || '[' + wordChars + ']');
+    this.tokeniser = new RegExp('([^' + wordChars + this.tagChar + ']+)');
     this.tags      = [];
     this.tokens    = [];
 
@@ -25,7 +29,7 @@ HashtagParser.prototype._parse = function() {
         lastToken = token;
     }
 
-    self.str.split(/(\s+)/).forEach(function(word) {
+    self.str.split(this.tokeniser).forEach(function(word) {
         if (exprTagFull.test(word)) {
             var tag = word.replace(exprTagBegin, '');
             self.tags.push(tag);
